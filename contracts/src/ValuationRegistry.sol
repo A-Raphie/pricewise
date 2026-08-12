@@ -46,12 +46,10 @@ contract ValuationRegistry is AccessControl {
     /// @notice Write (or overwrite) the attestation for `assetId`.
     /// @dev pre: caller has APPRAISER_ROLE; assetId != 0; fairValue > 0; confidenceBps <= 10000.
     ///      post: attestations[assetId] updated; Attested emitted. Preserves the storage invariant.
-    function attest(
-        bytes32 assetId,
-        uint96 fairValue,
-        uint16 confidenceBps,
-        bytes32 reasoningHash
-    ) external onlyRole(APPRAISER_ROLE) {
+    function attest(bytes32 assetId, uint96 fairValue, uint16 confidenceBps, bytes32 reasoningHash)
+        external
+        onlyRole(APPRAISER_ROLE)
+    {
         if (assetId == bytes32(0)) revert ZeroAssetId();
         if (fairValue == 0) revert ZeroFairValue();
         if (confidenceBps > 10000) revert ConfidenceOutOfRange();

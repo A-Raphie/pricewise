@@ -126,7 +126,7 @@ contract ValuationRegistryTest is Test {
     // 12. The public mapping getter equals getLatest().
     function test_PublicGetterMatchesGetLatest() public {
         _attestAs(appraiser, ASSET, 12_345e6, 7000);
-        (uint96 fv, , address ap, uint40 ts, ) = reg.attestations(ASSET);
+        (uint96 fv,, address ap, uint40 ts,) = reg.attestations(ASSET);
         ValuationRegistry.Attestation memory b = reg.getLatest(ASSET);
         assertEq(uint256(fv), uint256(b.fairValue));
         assertEq(ap, b.appraiser);
