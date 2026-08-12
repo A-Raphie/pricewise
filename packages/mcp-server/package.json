@@ -1,0 +1,25 @@
+{
+  "name": "@pricewise/mcp-server",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": { "pricewise-mcp": "dist/index.js" },
+  "files": ["dist", "src"],
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --dts --clean --banner=\"#!/usr/bin/env node\"",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "@pricewise/sdk": "workspace:*",
+    "viem": "^2.21.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsup": "^8.3.0",
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0"
+  }
+}
