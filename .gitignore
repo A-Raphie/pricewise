@@ -1,0 +1,28 @@
+# secrets — never commit
+.env
+.env.*
+!.env.example
+
+# foundry
+contracts/cache
+contracts/out
+contracts/broadcast
+contracts/lib
+
+# node / web
+node_modules
+dist
+.next
+.turbo
+.vercel
+.wrangler
+
+# python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# misc
+.DS_Store
+*.log
