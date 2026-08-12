@@ -6,18 +6,26 @@
 
 ## 1. Current status
 
-**Phase: spec/docs complete — code not yet started.**
+**Phase: v0.1.0 built & green (all autonomous work done).** Remaining items need external credentials/infra.
 
 | Artifact | State |
 |---|---|
-| `PRD.md` | ✅ written |
-| `Memory.md` | ✅ written (facts + decisions + assumptions) |
-| `Architecture.md` | ✅ written |
-| `Tasks.md` | ✅ written (the operating backlog) |
-| `Handoff.md` | ✅ this file |
-| Repo scaffold + contracts + engine + surfaces | ⬜ not started → begin at `Tasks.md` D1 |
+| Spec docs (PRD/Architecture/Tasks/Memory/Handoff) | ✅ written, repositioned to active agent |
+| Contracts (`ValuationRegistry` + `InvoiceToken`, deploy script) | ✅ **12 tests green** |
+| Valuation engine (core + FastAPI + LangGraph + seams) | ✅ **22 tests green** |
+| `@pricewise/sdk` | ✅ 6 tests, tsup build, typecheck clean |
+| `@pricewise/mcp-server` | ✅ 6 tools, live `tools/list`, 3 tests |
+| `@pricewise/api` (Hono x402) | ✅ 402 gate, 2 tests |
+| `@pricewise/web` (dashboard) | ✅ Vite build green |
+| `examples/demo-local.sh` | ✅ e2e verified on anvil (appraise→attest→read→detect) |
+| README/SECURITY/CONTRIBUTING/CHANGELOG + root CI | ✅ |
+| Public testnet deploy | ⬜ needs funded key |
+| npm publish `@pricewise/*` | ⬜ needs npm token |
+| OKX.AI ASP listing | ⬜ needs OKX.AI registration |
+| Real OnchainOS comps / LLM explain | ⬜ env-gated seams (OKX/OpenAI keys) |
+| Hackathon submission | ⬜ needs the form |
 
-**Next action:** execute `Tasks.md`, **Phase 1 (D1–D2): Foundation**. The very first sub-step is the **D1 OnchainOS gate** (verify API access) — do not write app code until that passes.
+**Next action (needs user):** fund a testnet key + provide OKX/OpenAI keys to light up the real integrations and do the public deploy; then publish packages and submit.
 
 ## 2. The one paragraph you need
 
