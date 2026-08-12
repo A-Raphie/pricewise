@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  contracts:
+    name: Contracts (Foundry)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+      - name: Install OpenZeppelin
+        working-directory: contracts
+        run: forge install OpenZeppelin/openzeppelin-contracts --no-git
+      - name: Build + test
+        working-directory: contracts
+        run: forge test
+
+  engine:
+    name: Valuation engine (Python)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install deps
+        working-directory: valuation-engine
+        run: |
+          python -m venv .venv
+          .venv/bin/pip install -U pip
+          .venv/bin/pip install fastapi 'uvicorn[standard]' httpx openai langgraph
+      - name: Test
+        working-directory: valuation-engine
+        run: PYTHONPATH=. .venv/bin/python -m unittest discover -s tests
+
+  ts:
+    name: TS workspaces
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm -r build
+      - run: pnpm -r typecheck
+      - run: pnpm -r test
