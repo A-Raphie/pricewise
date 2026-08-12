@@ -1,0 +1,8 @@
+# The core engine is pure stdlib — nothing required to run or test it.
+#
+# Optional integrations (install only when wiring those layers):
+#   langgraph>=0.2     # graph.py node wiring
+#   fastapi>=0.110     # app.py POST /appraise
+#   uvicorn>=0.27      # serves app.py
+#   openai>=1.10       # explain.py LLM node (or anthropic)
+#   httpx>=0.27        # comps.py OnchainOS okx-dex-market client
