@@ -4,7 +4,7 @@ WORKDIR /app
 RUN corepack enable
 COPY package.json pnpm-workspace.yaml pnpm-lock.yaml tsconfig.base.json .npmrc ./
 COPY packages ./packages
-COPY apps/web ./apps/web
+COPY apps ./apps
 RUN pnpm install --frozen-lockfile
 RUN pnpm --filter @pricewise/sdk build && pnpm --filter @pricewise/web build
 
