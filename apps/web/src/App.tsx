@@ -15,10 +15,10 @@ const loadConfig = () => {
 export default function App() {
   const initial = {
     engineUrl: import.meta.env.DEV ? 'http://localhost:8000' : '',
-    rpc: 'http://127.0.0.1:8545',
-    chainId: '31337',
-    registry: '',
-    token: '',
+    rpc: 'https://testrpc.xlayer.tech',
+    chainId: '1952',
+    registry: '0xB50eCDE9c94AaFBAF8aaC1e337B2c694223e4E79',
+    token: '0x0000000000000000000000000000000000000000',
     appraiserKey: '',
     ...loadConfig(),
   }
