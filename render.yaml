@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: pricewise
+    runtime: docker
+    plan: free
+    region: singapore
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: GEMINI_API_KEY
+        sync: false # set this in the Render dashboard (your free Google AI Studio key)
+      - key: GEMINI_MODEL
+        value: gemini-flash-latest
+      - key: STATIC_DIR
+        value: /app/static
+      - key: VALUATION_REGISTRY_ADDRESS
+        value: 0xB50eCDE9c94AaFBAF8aaC1e337B2c694223e4E79
+      - key: INVOICE_TOKEN_ADDRESS
+        value: "0x0000000000000000000000000000000000000000"
+      - key: XLAYER_TESTNET_RPC
+        value: https://testrpc.xlayer.tech
+      - key: XLAYER_CHAIN_ID
+        value: "1952"

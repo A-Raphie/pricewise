@@ -7,6 +7,7 @@ LLM explain node activates; comps fall back to the seeded set until OnchainOS is
 
 from __future__ import annotations
 
+import os
 from datetime import date
 from decimal import Decimal
 from typing import Optional
@@ -98,3 +99,12 @@ def appraise_endpoint(req: InvoiceRequest) -> ValuationResponse:
             for c in v.comps
         ],
     )
+
+
+# When STATIC_DIR is set (e.g. in the container deploy), serve the dashboard at /
+# so one service = dashboard + engine on the same origin (no CORS/config needed).
+_static_dir = os.getenv("STATIC_DIR")
+if _static_dir:
+    from fastapi.staticfiles import StaticFiles
+
+    app.mount("/", StaticFiles(directory=_static_dir, html=True), name="web")

@@ -14,7 +14,7 @@ const loadConfig = () => {
 
 export default function App() {
   const initial = {
-    engineUrl: 'http://localhost:8000',
+    engineUrl: import.meta.env.DEV ? 'http://localhost:8000' : '',
     rpc: 'http://127.0.0.1:8545',
     chainId: '31337',
     registry: '',
