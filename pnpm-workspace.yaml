@@ -1,5 +1,7 @@
 packages:
   - "packages/*"
   - "apps/*"
-allowBuilds:
-  esbuild: set this to true or false
+
+# pnpm 11 reads build approval here (not package.json). esbuild (tsup + vite) needs its postinstall.
+onlyBuiltDependencies:
+  - esbuild

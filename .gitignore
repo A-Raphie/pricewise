@@ -11,11 +11,13 @@ contracts/lib
 
 # node / web
 node_modules
-dist
+packages/*/dist
+apps/api/dist
 .next
 .turbo
 .vercel
 .wrangler
+# NOTE: apps/web/dist IS committed (prebuilt static dashboard for the deploy)
 
 # python
 __pycache__/
