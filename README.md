@@ -1,7 +1,7 @@
 # Pricewise
 
 ![status](https://img.shields.io/badge/status-building%20(OKX%20Build%20X%20AI%20Season)-brightgreen)
-![network](https://img.shields.io/badge/network-XLayer%20Testnet%20(195)%20%2F%20anvil-blue)
+![network](https://img.shields.io/badge/network-XLayer%20Testnet%20(1952)%20%E2%9C%93%20%2F%20anvil-blue)
 ![license](https://img.shields.io/badge/license-MIT-blue)
 ![tests](https://img.shields.io/badge/contracts%2012%20%2F%20engine%2022%20%2F%20ts%2011-passing-success)
 
@@ -87,8 +87,9 @@ cd contracts && APPRAISER_ADDRESS=0x… DEPLOYER_PRIVATE_KEY=0x… \
 Pricewise holds **no custodial funds**. Role-gated writes, bounds-checked attestation, deterministic valuation core (LLM can't override the number), confidence floor. See [SECURITY.md](./SECURITY.md).
 
 ## Status & seams
-- **Done & green:** contracts, engine core + integration, SDK, MCP server, x402 api, dashboard, end-to-end anvil demo, CI.
-- **Needs external credentials/infra (documented seams):** real OnchainOS comps (OKX API keys), real LLM explain (OpenAI key), public testnet/mainnet deploy (funded key), npm publish of `@pricewise/*`, OKX.AI ASP listing, hackathon submission.
+- **Done & green:** contracts, engine core + integration, SDK, MCP server, x402 api, dashboard, end-to-end anvil demo, **public testnet deploy**, CI.
+- **Deployed (X Layer testnet, chain 1952):** `ValuationRegistry` at [`0xB50eCDE9c94AaFBAF8aaC1e337B2c694223e4E79`](https://www.oklink.com/xlayer-test/address/0xB50eCDE9c94AaFBAF8aaC1e337B2c694223e4E79) — appraiser `0xd65c3f42cd889E471802B2c8d183E50a5f098F15`; a sample attestation was written and read back live.
+- **Needs external credentials/infra (documented seams):** real OnchainOS comps (OKX API keys), real LLM explain (OpenAI key), mainnet launch, npm publish of `@pricewise/*`, OKX.AI ASP listing, hackathon submission.
 
 ## Stack
 Solidity + Foundry · TypeScript + viem / MCP / Hono / React · Python + LangGraph + FastAPI · OKX OnchainOS (`okx-dex-market`, `okx-agentic-wallet`, OKX DEX Swap, `okx-ai`, x402).

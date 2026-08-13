@@ -19,7 +19,7 @@
 | `@pricewise/web` (dashboard) | ✅ Vite build green |
 | `examples/demo-local.sh` | ✅ e2e verified on anvil (appraise→attest→read→detect) |
 | README/SECURITY/CONTRIBUTING/CHANGELOG + root CI | ✅ |
-| Public testnet deploy | ⬜ needs funded key |
+| Public testnet deploy | ✅ deployed — `ValuationRegistry` at `0xB50eCDE9c94AaFBAF8aaC1e337B2c694223e4E79` (chain 1952); sample attestation verified live |
 | npm publish `@pricewise/*` | ⬜ needs npm token |
 | OKX.AI ASP listing | ⬜ needs OKX.AI registration |
 | Real OnchainOS comps / LLM explain | ⬜ env-gated seams (OKX/OpenAI keys) |
@@ -54,7 +54,7 @@ pricewise/
 - **Node** ≥ 20 + **pnpm** (monorepo)
 - **Python** ≥ 3.11 + `uv` (or pip + venv) for the valuation-engine
 - **Foundry** (`curl -L https://foundry.paradigm.xyz | bash && foundryup`) for Solidity
-- A funded **X Layer Testnet** deployer wallet (chain 195; faucet via OKX docs)
+- A funded **X Layer Testnet** deployer wallet (chain 1952; faucet via OKX docs)
 - **OKX Developer Portal** API credentials (for OnchainOS)
 
 ## 5. Environment variables
@@ -117,7 +117,7 @@ pnpm publish -r --access public
 
 1. **D1 gate:** verify OnchainOS access (sandbox keys → call `okx-dex-market` for a token). Block on this.
 2. Scaffold the pnpm monorepo + Foundry harness.
-3. Write `ValuationRegistry.sol` v1 + tests + `Deploy.s.sol`; deploy to X Layer testnet (195).
+3. Write `ValuationRegistry.sol` v1 + tests + `Deploy.s.sol`; deploy to X Layer testnet (1952).
 4. Record the deployed address into `.env` (`VALUATION_REGISTRY_ADDRESS`) and (later) the README.
 
 ## 10. Known unknowns to resolve early

@@ -63,7 +63,7 @@ Docs: https://web3.okx.com/onchainos/dev-docs/home/what-is-onchainos · Swap API
 
 | | Testnet | Mainnet |
 |---|---|---|
-| Chain id | **195** | 196 |
+| Chain id | **1952** (live testnet; some docs/older projects say 195) | 196 |
 | RPC | `https://xlayertestrpc.okx.com` | `https://xlayerrpc.okx.com` |
 | Explorer | oklink.com/xlayer-test | oklink.com/xlayer |
 | Faucet | available via OKX docs | — |
@@ -79,6 +79,8 @@ X Layer = Ethereum L2, enhanced OP Stack, OKB-powered. Dev docs: https://web3.ok
 - **Distribution:** listed on OKX.AI via `okx-ai` (ERC-8004 identity); monetized x402.
 
 ## 6. Decisions made (and why)
+
+- **2026-08-13 — Public testnet deploy DONE.** Deployer `0x653ffF…` faucet-funded; `ValuationRegistry` deployed to X Layer testnet (chain 1952) at `0xB50eCDE9c94AaFBAF8aaC1e337B2c694223e4E79`; appraiser `0xd65c3f42…`; sample attestation written + read back live. Note: the live testnet chain id is **1952** (both `testrpc.xlayer.tech` and `xlayertestrpc.okx.com` serve the same network); older docs saying 195 are outdated. Recorded in README + .env `VALUATION_REGISTRY_ADDRESS`.
 
 - **2026-08-12 — Repositioned to active niche agent (post-autopsy).** Ran `before-you-build` + `idea-autopsy`. Verdict: **SURVIVED, conditional.** Two kill-risks found and answered:
   - `crowded` — onchain RWA price feeds are incumbent-owned (**Chainlink** Live RWA Prices, **DIA xReal** 10k+ feeds, **RedStone**). *But* they cover **liquid** RWA with **deterministic** oracles → our niche is **AI appraisal of illiquid/private RWA (invoices)**, which they don't touch.
