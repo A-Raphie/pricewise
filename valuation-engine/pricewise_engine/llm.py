@@ -35,7 +35,7 @@ def make_llm_explain(model: Optional[str] = None) -> Optional[ExplainFn]:
 
     if gemini_key:
         client = OpenAI(api_key=gemini_key, base_url=_GEMINI_BASE_URL)
-        model = model or os.getenv("GEMINI_MODEL", "gemini-2.0-flash")
+        model = model or os.getenv("GEMINI_MODEL", "gemini-flash-latest")
     else:
         client = OpenAI(api_key=openai_key)
         model = model or os.getenv("OPENAI_MODEL", "gpt-4o-mini")
