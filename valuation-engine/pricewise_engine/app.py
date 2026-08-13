@@ -16,7 +16,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 from .appraise import appraise
-from .llm import make_openai_explain
+from .llm import make_llm_explain
 from .models import Comp, Invoice
 
 app = FastAPI(title="Pricewise valuation engine", version="0.1.0")
@@ -78,7 +78,7 @@ def appraise_endpoint(req: InvoiceRequest) -> ValuationResponse:
 
         v = appraise_via_graph(invoice, valuation_date=req.issue_date)
     else:
-        v = appraise(invoice, valuation_date=req.issue_date, llm=make_openai_explain())
+        v = appraise(invoice, valuation_date=req.issue_date, llm=make_llm_explain())
 
     return ValuationResponse(
         invoice_id=v.invoice_id,

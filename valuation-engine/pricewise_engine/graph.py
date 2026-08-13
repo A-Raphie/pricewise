@@ -16,7 +16,7 @@ from langgraph.graph import END, START, StateGraph
 from .comps import OnchainOSFetcher, fetch_comps
 from .core import confidence_heuristic, days_to_maturity, fair_value, score_debtor_risk, to_asset_units
 from .explain import ExplainFn, explain
-from .llm import make_openai_explain
+from .llm import make_llm_explain
 from .models import Invoice, Valuation
 
 
@@ -139,7 +139,7 @@ def appraise_via_graph(
 ) -> Valuation:
     """Run the LangGraph pipeline. Falls back to onchainos=None / llm=auto."""
     graph = build_graph()
-    llm_resolved = llm if llm is not None else make_openai_explain()
+    llm_resolved = llm if llm is not None else make_llm_explain()
     state: GState = {
         "invoice": invoice,
         "valuation_date": valuation_date,
