@@ -2,7 +2,8 @@
 .github
 node_modules
 **/node_modules
-**/dist
+packages/*/dist
+apps/api/dist
 **/.venv
 **/__pycache__
 .env
