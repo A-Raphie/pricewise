@@ -2,6 +2,12 @@
 
 Copy-paste content for the OKX Build X Series (AI Season) submission + the OKX.AI ASP listing + npm publish. Live contract and repo are ready; the only missing pieces are your accounts/keys (noted at the end).
 
+## Live URLs
+- **Project URL (live app — dashboard + real Gemini /appraise):** https://pricewise-1cpo.onrender.com
+- **GitHub repo:** https://github.com/A-Raphie/pricewise
+- **ValuationRegistry (X Layer testnet, chain 1952):** https://www.oklink.com/xlayer-test/address/0xB50eCDE9c94AaFBAF8aaC1e337B2c694223e4E79
+
+
 ---
 
 ## 1. Hackathon submission (paste into the OKX form)
