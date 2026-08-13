@@ -1,5 +1,5 @@
 # ---- Stage 1: build the dashboard (static) ----
-FROM node:20-slim AS web
+FROM node:22-slim AS web
 WORKDIR /app
 RUN corepack enable
 COPY package.json pnpm-workspace.yaml pnpm-lock.yaml tsconfig.base.json .npmrc ./
