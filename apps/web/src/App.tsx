@@ -93,6 +93,9 @@ export default function App() {
   const misprice = val && ask ? detectMisprice(val.fairValueAssetUnits, BigInt(Math.round(Number(ask) * 1_000_000))) : null
   const confBand = (b: number): [string, string] =>
     b >= 7500 ? ['high', 'good'] : b >= 5000 ? ['medium', ''] : ['low', 'bad']
+  const pctPar = (n: number) => (n * 100).toFixed(2) + '%'
+  const fmtVol = (n: number) => (n >= 1e6 ? (n / 1e6).toFixed(2) + 'M' : n >= 1e3 ? (n / 1e3).toFixed(1) + 'K' : n.toFixed(0))
+  const confCells = Math.round((val?.confidenceBps ?? 0) / 1000)
   const activeStep = !val ? 1 : !tx ? 2 : 3
 
   return (
@@ -111,6 +114,13 @@ export default function App() {
       <div className="kicker">
         <span className="lead">An active AI appraisal agent.</span> Oracles price liquid RWA — invoices have no
         price and no oracle. Appraise → attest onchain → act on mispricing.
+      </div>
+
+      <div className="strip">
+        <span className="seg"><span className="live">live</span></span>
+        <span className="seg">X Layer <b>{cfg.chainId}</b></span>
+        <span className="seg">comps via <b>OKX DEX</b></span>
+        <span className="seg">registry <b>{cfg.registry ? `${cfg.registry.slice(0, 6)}…${cfg.registry.slice(-4)}` : '—'}</b></span>
       </div>
 
       <div className="steps" aria-label="appraise attest act loop">
@@ -197,11 +207,14 @@ export default function App() {
                 <div className="subline">
                   fair value · {val.fairValueAssetUnits.toString()} units @6dp · asset {val.assetId.slice(0, 10)}…
                 </div>
-                <div className="kv">
-                  <span className="k">Confidence</span>
-                  <span className={`pill ${confBand(val.confidenceBps)[1]}`}>
-                    {val.confidenceBps} bps · {confBand(val.confidenceBps)[0]}
-                  </span>
+                <div className="bar" aria-label={`confidence ${val.confidenceBps} basis points`}>
+                  {Array.from({ length: 10 }).map((_, i) => (
+                    <i key={i} className={i < confCells ? 'on' : ''} />
+                  ))}
+                </div>
+                <div className="barlabel">
+                  <span>confidence · {confBand(val.confidenceBps)[0]}</span>
+                  <span className={`pill ${confBand(val.confidenceBps)[1]}`}>{val.confidenceBps} bps</span>
                 </div>
                 <div className="kv">
                   <span className="k">Annual rate</span>
@@ -213,8 +226,26 @@ export default function App() {
                 </div>
                 <div className="kv">
                   <span className="k">Comps</span>
-                  <span className="v">{val.comps.length} on-chain</span>
+                  <span className="v">{val.comps.length} on-chain peers</span>
                 </div>
+                {val.comps.length > 0 && (
+                  <table className="comps">
+                    <caption>OKX DEX · comparable invoice tokens</caption>
+                    <thead>
+                      <tr><th>token</th><th className="num">px / par</th><th className="num">24h vol</th><th className="num">liquidity</th></tr>
+                    </thead>
+                    <tbody>
+                      {val.comps.map((c) => (
+                        <tr key={c.token}>
+                          <td className="sym">{c.token}</td>
+                          <td className="num">{pctPar(c.priceUsd)}</td>
+                          <td className="num">${fmtVol(c.volume24h)}</td>
+                          <td className="num">${fmtVol(c.liquidityUsd)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
                 <div className="reasoning">{val.reasoning}</div>
               </>
             )}

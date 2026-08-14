@@ -19,7 +19,7 @@ export interface ValuationResult {
   annualRate: number
   daysToMaturity: number
   reasoning: string
-  comps: Array<{ token: string; priceUsd: number }>
+  comps: Array<{ token: string; priceUsd: number; volume24h: number; liquidityUsd: number }>
   assetId: Hex
 }
 
@@ -78,7 +78,12 @@ export class PricewiseClient {
       annualRate: j.annual_rate,
       daysToMaturity: j.days_to_maturity,
       reasoning: j.reasoning as string,
-      comps: (j.comps ?? []).map((c: any) => ({ token: c.token, priceUsd: c.price_usd })),
+      comps: (j.comps ?? []).map((c: any) => ({
+        token: c.token,
+        priceUsd: c.price_usd,
+        volume24h: c.volume_24h ?? 0,
+        liquidityUsd: c.liquidity_usd ?? 0,
+      })),
       assetId: assetId(chainId, this.opts.invoiceTokenAddress, invoice.invoiceId),
     }
   }
