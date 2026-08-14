@@ -1,6 +1,5 @@
 import { useState } from 'react'
-import { createPublicClient, createWalletClient, http } from 'viem'
-import { privateKeyToAccount } from 'viem/accounts'
+import { createPublicClient, createWalletClient, http, custom, type Chain } from 'viem'
 import { PricewiseClient, detectMisprice, type ValuationResult } from '@pricewise/sdk'
 
 const LS = 'pricewise.config'
@@ -12,6 +11,18 @@ const loadConfig = () => {
   }
 }
 
+// viem has no built-in X Layer testnet chain — define it.
+const xlayerTestnet: Chain = {
+  id: 1952,
+  name: 'X Layer Testnet',
+  nativeCurrency: { name: 'OKB', symbol: 'OKB', decimals: 18 },
+  rpcUrls: { default: { http: ['https://testrpc.xlayer.tech'] } },
+  blockExplorers: { default: { name: 'OKLink', url: 'https://www.okx.com/explorer/xlayer-test' } },
+  testnet: true,
+}
+
+const getProvider = (): any => (window as any).okxwallet ?? (window as any).ethereum
+
 export default function App() {
   const initial = {
     engineUrl: import.meta.env.DEV ? 'http://localhost:8000' : '',
@@ -19,7 +30,6 @@ export default function App() {
     chainId: '1952',
     registry: '0xB50eCDE9c94AaFBAF8aaC1e337B2c694223e4E79',
     token: '0x0000000000000000000000000000000000000000',
-    appraiserKey: '',
     ...loadConfig(),
   }
   const [cfg, setCfg] = useState(initial)
@@ -42,16 +52,27 @@ export default function App() {
   const [busy, setBusy] = useState('')
   const [err, setErr] = useState('')
 
+  // wallet state
+  const [walletAddr, setWalletAddr] = useState('')
+  const [roleStatus, setRoleStatus] = useState<'' | 'requesting' | 'granted'>('')
+
+  const engineOrigin = () => cfg.engineUrl || ''
+
   const client = () => {
     if (!cfg.registry || !cfg.token) throw new Error('Set registry + invoice token addresses in Config.')
-    const account = cfg.appraiserKey ? privateKeyToAccount(cfg.appraiserKey as `0x${string}`) : undefined
+    const provider = getProvider()
+    const publicClient = createPublicClient({ transport: http(cfg.rpc) })
+    const walletClient =
+      walletAddr && provider
+        ? createWalletClient({ account: walletAddr as `0x${string}`, chain: xlayerTestnet, transport: custom(provider) })
+        : undefined
     return new PricewiseClient({
       engineUrl: cfg.engineUrl,
       registryAddress: cfg.registry as `0x${string}`,
       invoiceTokenAddress: cfg.token as `0x${string}`,
       chainId: Number(cfg.chainId),
-      publicClient: createPublicClient({ transport: http(cfg.rpc) }),
-      walletClient: account ? createWalletClient({ account, transport: http(cfg.rpc) }) : undefined,
+      publicClient,
+      walletClient,
     })
   }
 
@@ -90,6 +111,81 @@ export default function App() {
     }
   }
 
+  const ensureChain = async (provider: any) => {
+    try {
+      await provider.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x7A0' }] }) // 1952
+    } catch (e: any) {
+      if (e?.code === 4902) {
+        await provider.request({
+          method: 'wallet_addEthereumChain',
+          params: [
+            {
+              chainId: '0x7A0',
+              chainName: 'X Layer Testnet',
+              nativeCurrency: { name: 'OKB', symbol: 'OKB', decimals: 18 },
+              rpcUrls: ['https://testrpc.xlayer.tech'],
+              blockExplorerUrls: ['https://www.okx.com/explorer/xlayer-test'],
+            },
+          ],
+        })
+      } else {
+        throw e
+      }
+    }
+  }
+
+  const grantRole = async (addr: string) => {
+    setRoleStatus('requesting')
+    try {
+      const r = await fetch(`${engineOrigin()}/grant-appraiser-role`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ address: addr }),
+      })
+      const j = await r.json()
+      if (!j.ok) {
+        setErr('Role grant failed: ' + (j.error || 'unknown'))
+        setRoleStatus('')
+        return
+      }
+      // poll until the role read confirms (tx mined)
+      for (let i = 0; i < 12; i++) {
+        await new Promise((res) => setTimeout(res, 1500))
+        const h = await fetch(`${engineOrigin()}/has-appraiser-role?address=${addr}`).then((x) => x.json())
+        if (h.ok && h.hasRole) {
+          setRoleStatus('granted')
+          return
+        }
+      }
+      setRoleStatus('granted') // tx mined; assume granted even if read lags
+    } catch (e: any) {
+      setErr('Role grant failed: ' + (e?.message || e))
+      setRoleStatus('')
+    }
+  }
+
+  const connect = async () => {
+    setErr('')
+    const provider = getProvider()
+    if (!provider) {
+      setErr('No wallet found. Install OKX Wallet or MetaMask.')
+      return
+    }
+    try {
+      const [addr] = await provider.request({ method: 'eth_requestAccounts' })
+      await ensureChain(provider)
+      setWalletAddr(addr)
+      await grantRole(addr)
+    } catch (e: any) {
+      setErr('Connect failed: ' + (e?.message || e))
+    }
+  }
+
+  const disconnect = () => {
+    setWalletAddr('')
+    setRoleStatus('')
+  }
+
   const misprice = val && ask ? detectMisprice(val.fairValueAssetUnits, BigInt(Math.round(Number(ask) * 1_000_000))) : null
   const confBand = (b: number): [string, string] =>
     b >= 7500 ? ['high', 'good'] : b >= 5000 ? ['medium', ''] : ['low', 'bad']
@@ -104,10 +200,23 @@ export default function App() {
         <div className="word">
           Price<b>wise</b>
         </div>
-        <div className="meta">
-          AI appraisal · illiquid/private RWA
-          <br />
-          X Layer · <span className="live">live</span>
+        <div className="wallet">
+          {walletAddr ? (
+            <>
+              <span className="addr">
+                {walletAddr.slice(0, 6)}…{walletAddr.slice(-4)}
+              </span>
+              {roleStatus === 'granted' && <span className="pill good">appraiser ✓</span>}
+              {roleStatus === 'requesting' && <span className="pill">granting role…</span>}
+              <button className="ghost sm" onClick={disconnect}>
+                disconnect
+              </button>
+            </>
+          ) : (
+            <button className="walletbtn" onClick={connect}>
+              Connect Wallet
+            </button>
+          )}
         </div>
       </header>
 
@@ -187,8 +296,6 @@ export default function App() {
             <input value={cfg.registry} onChange={(e) => saveCfg({ ...cfg, registry: e.target.value })} />
             <label>InvoiceToken address</label>
             <input value={cfg.token} onChange={(e) => saveCfg({ ...cfg, token: e.target.value })} />
-            <label>Appraiser private key (anvil/testnet only)</label>
-            <input value={cfg.appraiserKey} onChange={(e) => saveCfg({ ...cfg, appraiserKey: e.target.value })} />
           </section>
         </div>
 
@@ -230,9 +337,14 @@ export default function App() {
                 </div>
                 {val.comps.length > 0 && (
                   <table className="comps">
-                    <caption>OKX DEX · comparable invoice tokens</caption>
+                    <caption>OKX DEX · comparable market data</caption>
                     <thead>
-                      <tr><th>token</th><th className="num">px / par</th><th className="num">24h vol</th><th className="num">liquidity</th></tr>
+                      <tr>
+                        <th>token</th>
+                        <th className="num">px / par</th>
+                        <th className="num">24h vol</th>
+                        <th className="num">liquidity</th>
+                      </tr>
                     </thead>
                     <tbody>
                       {val.comps.map((c) => (
@@ -257,18 +369,22 @@ export default function App() {
               <p className="empty">Valuation required first.</p>
             ) : (
               <>
-                <button onClick={attest} disabled={!!busy || !cfg.appraiserKey}>
+                <button onClick={attest} disabled={!!busy || !walletAddr || roleStatus !== 'granted'}>
                   {busy === 'attest' ? 'Attesting…' : '02 — Attest onchain'}
                 </button>
                 {tx && (
                   <div className="kv" style={{ marginTop: 14 }}>
                     <span className="k">attested</span>
-                    <span className="pill good">tx {tx.slice(0, 10)}…</span>
+                    <a className="pill good" href={`https://www.okx.com/explorer/xlayer-test/tx/${tx}`} target="_blank" rel="noreferrer">
+                      tx {tx.slice(0, 10)}…
+                    </a>
                   </div>
                 )}
-                {!cfg.appraiserKey && (
-                  <div className="subline">Add an appraiser key in Config to write the attestation.</div>
-                )}
+                {!walletAddr && <div className="subline">Connect wallet to attest onchain.</div>}
+                {walletAddr && roleStatus !== 'granted' && <div className="subline">Granting appraiser role…</div>}
+                <a className="faucet" href="https://www.okx.com/xlayer/faucet" target="_blank" rel="noreferrer">
+                  get testnet OKB for gas →
+                </a>
               </>
             )}
           </section>

@@ -6,7 +6,7 @@ WORKDIR /app
 ENV PYTHONPATH=/app \
     PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
-RUN pip install --no-cache-dir fastapi 'uvicorn[standard]' httpx openai langgraph
+RUN pip install --no-cache-dir fastapi 'uvicorn[standard]' httpx openai langgraph eth-account
 COPY valuation-engine/pricewise_engine ./pricewise_engine
 COPY apps/web/dist ./static
 ENV STATIC_DIR=/app/static

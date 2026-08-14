@@ -101,6 +101,32 @@ def appraise_endpoint(req: InvoiceRequest) -> ValuationResponse:
     )
 
 
+class GrantRequest(BaseModel):
+    address: str
+
+
+@app.post("/grant-appraiser-role")
+def grant_role_endpoint(req: GrantRequest) -> dict:
+    """Demo/testnet only: deployer grants APPRAISER_ROLE so a connected wallet can attest."""
+    from .onchain import grant_appraiser_role
+
+    try:
+        tx = grant_appraiser_role(req.address)
+        return {"ok": True, "tx": tx, "address": req.address}
+    except Exception as e:  # noqa: BLE001 - surface the message to the UI
+        return {"ok": False, "error": str(e)}
+
+
+@app.get("/has-appraiser-role")
+def has_role_endpoint(address: str) -> dict:
+    from .onchain import has_appraiser_role
+
+    try:
+        return {"ok": True, "hasRole": has_appraiser_role(address), "address": address}
+    except Exception as e:  # noqa: BLE001
+        return {"ok": False, "error": str(e)}
+
+
 # When STATIC_DIR is set (e.g. in the container deploy), serve the dashboard at /
 # so one service = dashboard + engine on the same origin (no CORS/config needed).
 _static_dir = os.getenv("STATIC_DIR")
