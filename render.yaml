@@ -22,3 +22,11 @@ services:
         value: https://testrpc.xlayer.tech
       - key: XLAYER_CHAIN_ID
         value: "1952"
+      - key: OKX_API_KEY
+        sync: false # set in the Render dashboard (OKX developer portal)
+      - key: OKX_SECRET_KEY
+        sync: false
+      - key: OKX_PASSPHRASE
+        sync: false
+      - key: OKX_PROJECT_ID
+        sync: false # shown next to the API key in the OKX developer portal

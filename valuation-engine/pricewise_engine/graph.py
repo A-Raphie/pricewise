@@ -13,7 +13,7 @@ from typing import Optional, TypedDict
 
 from langgraph.graph import END, START, StateGraph
 
-from .comps import OnchainOSFetcher, fetch_comps
+from .comps import OnchainOSFetcher, fetch_comps_with_source
 from .core import confidence_heuristic, days_to_maturity, fair_value, score_debtor_risk, to_asset_units
 from .explain import ExplainFn, explain
 from .llm import make_llm_explain
@@ -30,6 +30,7 @@ class GState(TypedDict, total=False):
     # computed
     days: int
     comps: list
+    comps_source: str
     debtor_rate: Decimal
     effective_rate: Decimal
     fair_value: Decimal
@@ -48,8 +49,8 @@ def _n_dates(s: GState) -> dict:
 
 
 def _n_comps(s: GState) -> dict:
-    comps = fetch_comps(s["invoice"], onchainos=s.get("onchainos"))
-    return {"comps": comps}
+    comps, source = fetch_comps_with_source(s["invoice"], onchainos=s.get("onchainos"))
+    return {"comps": comps, "comps_source": source}
 
 
 def _n_risk(s: GState) -> dict:
@@ -105,6 +106,7 @@ def _n_emit(s: GState) -> dict:
         days_to_maturity=s["days"],
         reasoning=s["reasoning"],
         comps=s["comps"],
+        comps_source=s.get("comps_source", "seeded"),
     )
     return {"valuation": valuation}
 

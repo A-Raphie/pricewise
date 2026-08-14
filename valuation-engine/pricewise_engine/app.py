@@ -19,6 +19,7 @@ from pydantic import BaseModel, Field
 from .appraise import appraise
 from .llm import make_llm_explain
 from .models import Comp, Invoice
+from .onchainos import fetch_comps_onchainos, okx_configured
 
 app = FastAPI(title="Pricewise valuation engine", version="0.1.0")
 app.add_middleware(
@@ -56,11 +57,12 @@ class ValuationResponse(BaseModel):
     days_to_maturity: int
     reasoning: str
     comps: list[CompOut]
+    comps_source: str = "seeded"  # "live" (OKX DEX) | "seeded" (fallback)
 
 
 @app.get("/health")
 def health() -> dict:
-    return {"ok": True, "service": "pricewise-engine"}
+    return {"ok": True, "service": "pricewise-engine", "comps": "live" if okx_configured() else "seeded"}
 
 
 @app.post("/appraise", response_model=ValuationResponse)
@@ -74,12 +76,13 @@ def appraise_endpoint(req: InvoiceRequest) -> ValuationResponse:
         issue_date=req.issue_date,
         due_date=req.due_date,
     )
+    onchainos = fetch_comps_onchainos if okx_configured() else None
     if req.use_graph:
         from .graph import appraise_via_graph
 
-        v = appraise_via_graph(invoice, valuation_date=req.issue_date)
+        v = appraise_via_graph(invoice, valuation_date=req.issue_date, onchainos=onchainos)
     else:
-        v = appraise(invoice, valuation_date=req.issue_date, llm=make_llm_explain())
+        v = appraise(invoice, valuation_date=req.issue_date, onchainos=onchainos, llm=make_llm_explain())
 
     return ValuationResponse(
         invoice_id=v.invoice_id,
@@ -98,6 +101,7 @@ def appraise_endpoint(req: InvoiceRequest) -> ValuationResponse:
             )
             for c in v.comps
         ],
+        comps_source=v.comps_source,
     )
 
 

@@ -20,6 +20,7 @@ export interface ValuationResult {
   daysToMaturity: number
   reasoning: string
   comps: Array<{ token: string; priceUsd: number; volume24h: number; liquidityUsd: number }>
+  compsSource: 'live' | 'seeded'
   assetId: Hex
 }
 
@@ -84,6 +85,7 @@ export class PricewiseClient {
         volume24h: c.volume_24h ?? 0,
         liquidityUsd: c.liquidity_usd ?? 0,
       })),
+      compsSource: j.comps_source === 'live' ? 'live' : 'seeded',
       assetId: assetId(chainId, this.opts.invoiceTokenAddress, invoice.invoiceId),
     }
   }

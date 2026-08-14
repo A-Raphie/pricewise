@@ -225,7 +225,7 @@ export default function App() {
       <div className="strip">
         <span className="seg"><span className="live">live</span></span>
         <span className="seg">X Layer <b>{cfg.chainId}</b></span>
-        <span className="seg">comps <b>seeded</b> · OKX DEX keys pending</span>
+        <span className="seg">comps <b>{val?.compsSource === 'live' ? 'live OKX DEX' : 'seeded'}</b></span>
         <span className="seg">registry <b>{cfg.registry ? `${cfg.registry.slice(0, 6)}…${cfg.registry.slice(-4)}` : '·'}</b></span>
       </div>
 
@@ -330,12 +330,12 @@ export default function App() {
                 </div>
                 <div className="kv">
                   <span className="k">Comps</span>
-                  <span className="v">{val.comps.length} peers (seeded)</span>
+                  <span className="v">{val.comps.length} peers ({val.compsSource === 'live' ? 'live OKX DEX' : 'seeded'})</span>
                 </div>
                 {val.comps.length > 0 && (
                   <div className="scrollx">
                   <table className="comps">
-                    <caption>OKX DEX · comparable market data</caption>
+                    <caption>{val.compsSource === 'live' ? 'OKX DEX · live X Layer market data' : 'OKX DEX · seeded until API keys'}</caption>
                     <thead>
                       <tr>
                         <th>token</th>

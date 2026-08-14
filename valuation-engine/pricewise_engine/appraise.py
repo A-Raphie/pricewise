@@ -10,7 +10,7 @@ from datetime import date
 from decimal import Decimal
 from typing import Optional
 
-from .comps import OnchainOSFetcher, fetch_comps
+from .comps import OnchainOSFetcher, fetch_comps_with_source
 from .core import (
     confidence_heuristic,
     days_to_maturity,
@@ -42,7 +42,7 @@ def appraise(
         else 0
     )
 
-    comps = fetch_comps(invoice, onchainos=onchainos)
+    comps, comps_source = fetch_comps_with_source(invoice, onchainos=onchainos)
     debtor_rate = score_debtor_risk(invoice.debtor_tier, invoice.debtor_sector)
     # effective rate = debtor risk + cost of capital; this is what actually discounts.
     effective_rate = debtor_rate + cost_of_capital
@@ -83,4 +83,5 @@ def appraise(
         days_to_maturity=days,
         reasoning=reasoning,
         comps=comps,
+        comps_source=comps_source,
     )

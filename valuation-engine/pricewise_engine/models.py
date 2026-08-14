@@ -46,3 +46,4 @@ class Valuation:
     days_to_maturity: int
     reasoning: str
     comps: list[Comp] = field(default_factory=list)
+    comps_source: str = "seeded"  # "live" (OKX DEX API) | "seeded" (fallback)
