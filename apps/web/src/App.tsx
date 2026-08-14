@@ -11,7 +11,7 @@ const loadConfig = () => {
   }
 }
 
-// viem has no built-in X Layer testnet chain — define it.
+// viem has no built-in X Layer testnet chain · define it.
 const xlayerTestnet: Chain = {
   id: 1952,
   name: 'X Layer Testnet',
@@ -221,7 +221,7 @@ export default function App() {
       </header>
 
       <div className="kicker">
-        <span className="lead">An active AI appraisal agent.</span> Oracles price liquid RWA — invoices have no
+        <span className="lead">An active AI appraisal agent.</span> Oracles price liquid RWA · invoices have no
         price and no oracle. Appraise → attest onchain → act on mispricing.
       </div>
 
@@ -229,7 +229,7 @@ export default function App() {
         <span className="seg"><span className="live">live</span></span>
         <span className="seg">X Layer <b>{cfg.chainId}</b></span>
         <span className="seg">comps via <b>OKX DEX</b></span>
-        <span className="seg">registry <b>{cfg.registry ? `${cfg.registry.slice(0, 6)}…${cfg.registry.slice(-4)}` : '—'}</b></span>
+        <span className="seg">registry <b>{cfg.registry ? `${cfg.registry.slice(0, 6)}…${cfg.registry.slice(-4)}` : '·'}</b></span>
       </div>
 
       <div className="steps" aria-label="appraise attest act loop">
@@ -248,7 +248,7 @@ export default function App() {
         {/* LEFT: input + config */}
         <div className="col">
           <section className="card">
-            <h2>Invoice — input</h2>
+            <h2>Invoice · input</h2>
             <label>Invoice ID</label>
             <input value={inv.invoiceId} onChange={(e) => setInv({ ...inv, invoiceId: e.target.value })} />
             <div className="row">
@@ -276,7 +276,7 @@ export default function App() {
               </div>
             </div>
             <button onClick={appraise} disabled={!!busy}>
-              {busy === 'appraise' ? 'Appraising…' : '01 — Appraise'}
+              {busy === 'appraise' ? 'Appraising…' : '01 · Appraise'}
             </button>
           </section>
 
@@ -302,7 +302,7 @@ export default function App() {
         {/* RIGHT: proof cards */}
         <div className="col">
           <section className="card">
-            <h2>Valuation — proof</h2>
+            <h2>Valuation · proof</h2>
             {!val ? (
               <p className="empty">Run an appraisal to mint a fair-value proof.</p>
             ) : (
@@ -364,13 +364,13 @@ export default function App() {
           </section>
 
           <section className="card">
-            <h2>Attestation — onchain</h2>
+            <h2>Attestation · onchain</h2>
             {!val ? (
               <p className="empty">Valuation required first.</p>
             ) : (
               <>
                 <button onClick={attest} disabled={!!busy || !walletAddr || roleStatus !== 'granted'}>
-                  {busy === 'attest' ? 'Attesting…' : '02 — Attest onchain'}
+                  {busy === 'attest' ? 'Attesting…' : '02 · Attest onchain'}
                 </button>
                 {tx && (
                   <div className="kv" style={{ marginTop: 14 }}>
@@ -390,7 +390,7 @@ export default function App() {
           </section>
 
           <section className="card">
-            <h2>Act — detect misprice</h2>
+            <h2>Act · detect misprice</h2>
             {!val ? (
               <p className="empty">Appraise first.</p>
             ) : (
@@ -400,7 +400,7 @@ export default function App() {
                 {misprice && (
                   <div style={{ marginTop: 14 }}>
                     <div className={`verdict ${misprice.mispriced ? 'buy' : 'fair'}`}>
-                      {misprice.mispriced ? `MISPRICED — buy (gap ${misprice.gapBps} bps)` : 'fairly priced'}
+                      {misprice.mispriced ? `MISPRICED · buy (gap ${misprice.gapBps} bps)` : 'fairly priced'}
                     </div>
                     <div className="monoaddr">fair {val.fairValueAssetUnits.toString()} · ask {(Number(ask) * 1_000_000) | 0}</div>
                   </div>

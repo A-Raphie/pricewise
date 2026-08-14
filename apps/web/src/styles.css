@@ -4,9 +4,9 @@
 
 :root {
   --bg: #0a0b0f;
-  --surface: #14161f;
-  --surface-2: #1b1e2a;
-  --border: rgba(255, 255, 255, 0.08);
+  --surface: #1b1f2b;
+  --surface-2: #262b3c;
+  --border: rgba(255, 255, 255, 0.12);
   --border-strong: rgba(255, 255, 255, 0.16);
   --text: #f5f6fa;
   --text-2: #9aa0b4;
@@ -26,7 +26,7 @@
 html, body { margin: 0; }
 body {
   background:
-    radial-gradient(1100px 520px at 78% -8%, rgba(124, 108, 255, 0.10), transparent 60%),
+    radial-gradient(1100px 520px at 78% -8%, rgba(124, 108, 255, 0.16), transparent 60%),
     var(--bg);
   color: var(--text);
   font-family: var(--display);
