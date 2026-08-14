@@ -112,24 +112,21 @@ export default function App() {
   }
 
   const ensureChain = async (provider: any) => {
+    const chain = {
+      chainId: '0x7a0',
+      chainName: 'X Layer Testnet',
+      nativeCurrency: { name: 'OKB', symbol: 'OKB', decimals: 18 },
+      rpcUrls: ['https://testrpc.xlayer.tech'],
+      blockExplorerUrls: ['https://www.okx.com/explorer/xlayer-test'],
+    }
     try {
-      await provider.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x7A0' }] }) // 1952
-    } catch (e: any) {
-      if (e?.code === 4902) {
-        await provider.request({
-          method: 'wallet_addEthereumChain',
-          params: [
-            {
-              chainId: '0x7A0',
-              chainName: 'X Layer Testnet',
-              nativeCurrency: { name: 'OKB', symbol: 'OKB', decimals: 18 },
-              rpcUrls: ['https://testrpc.xlayer.tech'],
-              blockExplorerUrls: ['https://www.okx.com/explorer/xlayer-test'],
-            },
-          ],
-        })
-      } else {
-        throw e
+      await provider.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: chain.chainId }] })
+    } catch {
+      // chain not known to the wallet (some throw a non-4902 "unrecognized chain" error) -> add it
+      try {
+        await provider.request({ method: 'wallet_addEthereumChain', params: [chain] })
+      } catch {
+        /* best-effort: don't block connect; attest will re-prompt if on the wrong chain */
       }
     }
   }
@@ -336,6 +333,7 @@ export default function App() {
                   <span className="v">{val.comps.length} on-chain peers</span>
                 </div>
                 {val.comps.length > 0 && (
+                  <div className="scrollx">
                   <table className="comps">
                     <caption>OKX DEX · comparable market data</caption>
                     <thead>
@@ -357,6 +355,7 @@ export default function App() {
                       ))}
                     </tbody>
                   </table>
+                  </div>
                 )}
                 <div className="reasoning">{val.reasoning}</div>
               </>
