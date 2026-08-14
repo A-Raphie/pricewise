@@ -225,7 +225,7 @@ export default function App() {
       <div className="strip">
         <span className="seg"><span className="live">live</span></span>
         <span className="seg">X Layer <b>{cfg.chainId}</b></span>
-        <span className="seg">comps via <b>OKX DEX</b></span>
+        <span className="seg">comps <b>seeded</b> · OKX DEX keys pending</span>
         <span className="seg">registry <b>{cfg.registry ? `${cfg.registry.slice(0, 6)}…${cfg.registry.slice(-4)}` : '·'}</b></span>
       </div>
 
@@ -330,7 +330,7 @@ export default function App() {
                 </div>
                 <div className="kv">
                   <span className="k">Comps</span>
-                  <span className="v">{val.comps.length} on-chain peers</span>
+                  <span className="v">{val.comps.length} peers (seeded)</span>
                 </div>
                 {val.comps.length > 0 && (
                   <div className="scrollx">
