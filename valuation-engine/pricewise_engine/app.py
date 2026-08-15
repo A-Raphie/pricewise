@@ -94,7 +94,12 @@ class ValuationResponse(BaseModel):
 
 @app.get("/health")
 def health() -> dict:
-    return {"ok": True, "service": "pricewise-engine", "comps": "live" if okx_configured() else "seeded"}
+    return {
+        "ok": True,
+        "service": "pricewise-engine",
+        "comps": "live" if okx_configured() else "seeded",
+        "keepalive": bool(os.getenv("KEEPALIVE_URL")),
+    }
 
 
 @app.post("/appraise", response_model=ValuationResponse)
