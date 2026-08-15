@@ -30,3 +30,5 @@ services:
         sync: false
       - key: OKX_PROJECT_ID
         sync: false # shown next to the API key in the OKX developer portal
+      - key: KEEPALIVE_URL
+        value: https://pricewise-1cpo.onrender.com/health # self-ping so the free instance never idles out

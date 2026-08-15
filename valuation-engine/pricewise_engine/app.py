@@ -7,11 +7,14 @@ LLM explain node activates; comps fall back to the seeded set until OnchainOS is
 
 from __future__ import annotations
 
+import asyncio
 import os
+from contextlib import asynccontextmanager
 from datetime import date
 from decimal import Decimal
 from typing import Optional
 
+import httpx
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
@@ -21,7 +24,36 @@ from .llm import make_llm_explain
 from .models import Comp, Invoice
 from .onchainos import fetch_comps_onchainos, okx_configured
 
-app = FastAPI(title="Pricewise valuation engine", version="0.1.0")
+@asynccontextmanager
+async def _lifespan(_app: FastAPI):
+    """Keep the (free-tier) instance warm by self-pinging a public URL.
+
+    Render free instances spin down after ~15 min without inbound traffic. When
+    KEEPALIVE_URL is set (deploy only), ping it on an interval so the service
+    never goes idle. All errors are swallowed: keepalive must never affect
+    request serving. Unset locally -> no task, no stray requests.
+    """
+    task: Optional[asyncio.Task] = None
+    url = os.getenv("KEEPALIVE_URL")
+    if url:
+
+        async def _ping() -> None:
+            interval = float(os.getenv("KEEPALIVE_INTERVAL_SECONDS", "240"))
+            async with httpx.AsyncClient(timeout=10) as client:
+                while True:
+                    await asyncio.sleep(interval)
+                    try:
+                        await client.get(url)
+                    except Exception:  # noqa: BLE001 - keepalive is best-effort
+                        pass
+
+        task = asyncio.create_task(_ping())
+    yield
+    if task is not None:
+        task.cancel()
+
+
+app = FastAPI(title="Pricewise valuation engine", version="0.1.0", lifespan=_lifespan)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # demo; tighten in prod
