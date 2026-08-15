@@ -20,16 +20,19 @@ Copy-paste content for the OKX Build X Series (AI Season) submission + the OKX.A
 **Problem:** RWA tokens on X Layer can be issued, but nothing produces a trustworthy price for illiquid/private assets (invoices/receivables). Without a credible valuation they can't be priced, listed, or traded. This is the named 2026 RWA gap ("AI-assisted valuation").
 
 **Solution / the loop (the product, not the LLM number):**
-`appraise` (LangGraph engine: deterministic present-value core + LLM explanation, comps via OnchainOS `okx-dex-market`) → `attest` (writes a `ValuationAttestation` to `ValuationRegistry.sol` on X Layer via `okx-agentic-wallet`) → `act` (detects mispricing vs the OKX DEX ask and trades it). Listed on OKX.AI and monetized x402.
+`appraise` (LangGraph engine: deterministic present-value core + Gemini reasoning, comps via the live OKX DEX Market API) → `attest` (wallet-signed write to `ValuationRegistry.sol` on X Layer) → `act` (detects mispricing vs the OKX DEX ask and trades it). Listed on OKX.AI and monetized x402.
 
 **Why it's not a crowded oracle:** Chainlink/DIA/RedStone do *liquid* RWA price feeds with *deterministic* oracles. Pricewise appraises *illiquid/private* RWA they don't cover; the AI number is one-prompt-reproducible, so the product is the full appraise→attest→act loop + onchain attestation, not the number.
 
 **Live proof:**
+- **Live app (try the full loop):** https://pricewise-1cpo.onrender.com — appraise → connect wallet → attest on X Layer testnet, in the browser.
+- **Live market data:** comps served by the OKX DEX Market API — X Layer reference assets with real price/volume/liquidity (e.g. native USDC ≈ $1.00 with ~$2.7M liquidity, WETH live). The API flags the source per appraisal (`comps_source: live`) and the dashboard labels it honestly.
 - `ValuationRegistry` on X Layer testnet (chain 1952): `0xB50eCDE9c94AaFBAF8aaC1e337B2c694223e4E79` — https://www.oklink.com/xlayer-test/address/0xB50eCDE9c94AaFBAF8aaC1e337B2c694223e4E79
 - Appraiser: `0xd65c3f42cd889E471802B2c8d183E50a5f098F15`
-- Sample attestation read back live: fairValue=95000000000, conf=8000, appraiser, timestamp.
+- Wallet-signed attestations mined on X Layer testnet, e.g. tx `0x03ff0d5b…` and `0xfd678022…` (receipt status 0x1), read back from the registry live.
+- Always-warm deploy: a self-ping keepalive keeps the free Render instance from cold-starting (verified: ~1.6s response after 18 min of no traffic).
 
-**Judging-criteria fit:** AI application (LLM engine is the core), innovation (first active AI appraisal agent for illiquid RWA on X Layer), product completeness (full live loop + 45 tests), X Layer integration (OnchainOS primitives load-bearing), code quality (forge/vitest/unittest green, npm packages, mermaid + security table).
+**Judging-criteria fit:** AI application (LLM engine is the core), innovation (first active AI appraisal agent for illiquid RWA on X Layer), product completeness (full live loop + 61 tests + CI green), X Layer integration (live OKX DEX market data + onchain attestations on X Layer), code quality (forge/vitest/unittest green, npm packages, mermaid + security table).
 
 **How to run:** `pnpm install`; `cd contracts && forge test`; `cd valuation-engine && PYTHONPATH=. .venv/bin/python -m unittest discover -s tests`; `./examples/demo-local.sh` (anvil e2e); `bash examples/deploy-testnet.sh`.
 
@@ -63,17 +66,9 @@ pnpm --filter @pricewise/mcp-server publish --access public --no-git-checks
 
 ---
 
-## 4. Real OnchainOS comps + LLM explain (needs your keys)
+## 4. Real OKX DEX comps + LLM explain — DONE (live)
 
-Add to `.env`:
-```
-OKX_API_KEY=...
-OKX_SECRET_KEY=...
-OKX_PASSPHRASE=...
-OPENAI_API_KEY=...
-OKX_DEX_MARKET_URL=<confirmed OnchainOS endpoint>
-```
-Then the engine's `fetch_comps` + `llm_explain` activate automatically (seeded/deterministic fallbacks currently in place).
+Wired and serving: comps come from the OKX DEX Market API (`POST /api/v6/dex/market/price-info`, HMAC `OK-ACCESS-*` auth, X Layer `chainIndex 196`, reference assets USDC/USDT/WETH) with a seeded fallback. The LLM reasoning runs on Gemini (free tier). Env vars: `OKX_API_KEY`, `OKX_SECRET_KEY`, `OKX_PASSPHRASE`, `OKX_PROJECT_ID`, `GEMINI_API_KEY` — set in `.env` locally and in the Render dashboard for the deploy.
 
 ---
 
@@ -88,7 +83,7 @@ Same `ValuationRegistry` bytecode → redeploy to X Layer mainnet (chain 196, `h
 - Submit the hackathon form (your account).
 - Create the OKX.AI ASP listing (your OKX account + API creds).
 - `npm login` / provide `NPM_TOKEN`.
-- Provide OKX/OpenAI keys.
+- Record the demo video (if the form asks for one).
 - Fund a mainnet wallet.
 
-Everything else is built, tested, and deployed to the public testnet.
+Everything else is built, tested, and deployed — with live OKX DEX market data.

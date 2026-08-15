@@ -3,8 +3,11 @@
 ![status](https://img.shields.io/badge/status-building%20(OKX%20Build%20X%20AI%20Season)-brightgreen)
 ![network](https://img.shields.io/badge/network-XLayer%20Testnet%20(1952)%20%E2%9C%93%20%2F%20anvil-blue)
 ![license](https://img.shields.io/badge/license-MIT-blue)
-![tests](https://img.shields.io/badge/contracts%2012%20%2F%20engine%2022%20%2F%20ts%2011-passing-success)
+![tests](https://img.shields.io/badge/tests%20contracts%2012%20%2F%20engine%2038%20%2F%20ts%2011-passing-success)
+![ci](https://github.com/A-Raphie/pricewise/actions/workflows/ci.yml/badge.svg)
 
+> **Try it live:** **https://pricewise-1cpo.onrender.com** — appraise with live OKX DEX market data, connect your wallet, attest onchain on X Layer testnet.
+>
 > **An active AI appraisal agent for illiquid/private real-world assets** (invoices/receivables). It appraises with an LLM, attests the fair value **onchain on X Layer**, and **acts on mispriced invoices** via the OKX DEX — shipped as an OKX.AI Agent Service Provider.
 
 Oracles price *liquid* RWA (equities/ETFs/T-bills). **Illiquid/private RWA — invoices — has no price and no oracle.** Pricewise is the active AI appraisal agent that fills that gap: **appraise → attest → act**. The loop is the product, not the LLM number.
@@ -18,8 +21,8 @@ Onchain RWA price feeds already exist (Chainlink, DIA xReal, RedStone) — but t
 flowchart LR
   U["Caller: agent / dApp / dashboard"] -->|"appraise({invoice})"| API["apps/api (x402) → packages/sdk"]
   API --> ENG["valuation-engine (LangGraph, Python)"]
-  ENG -->|"fetch_comps"| MKT["OnchainOS okx-dex-market"]
-  ENG -->|"llm_explain"| LLM["LLM (OpenAI)"]
+  ENG -->|"fetch_comps"| MKT["OKX DEX Market API (live, X Layer)"]
+  ENG -->|"llm_explain"| LLM["LLM (Gemini)"]
   ENG -->|"{fairValue, conf, reasoning}"| API
   API -->|"contract call"| WAL["OnchainOS okx-agentic-wallet / viem"]
   WAL -->|"attest()"| REG["ValuationRegistry.sol (X Layer)"]
@@ -88,8 +91,10 @@ Pricewise holds **no custodial funds**. Role-gated writes, bounds-checked attest
 
 ## Status & seams
 - **Done & green:** contracts, engine core + integration, SDK, MCP server, x402 api, dashboard, end-to-end anvil demo, **public testnet deploy**, CI.
-- **Deployed (X Layer testnet, chain 1952):** `ValuationRegistry` at [`0xB50eCDE9c94AaFBAF8aaC1e337B2c694223e4E79`](https://www.oklink.com/xlayer-test/address/0xB50eCDE9c94AaFBAF8aaC1e337B2c694223e4E79) — appraiser `0xd65c3f42cd889E471802B2c8d183E50a5f098F15`; a sample attestation was written and read back live.
-- **Needs external credentials/infra (documented seams):** real OnchainOS comps (OKX API keys), real LLM explain (OpenAI key), mainnet launch, npm publish of `@pricewise/*`, OKX.AI ASP listing, hackathon submission.
+- **Deployed (X Layer testnet, chain 1952):** `ValuationRegistry` at [`0xB50eCDE9c94AaFBAF8aaC1e337B2c694223e4E79`](https://www.oklink.com/xlayer-test/address/0xB50eCDE9c94AaFBAF8aaC1e337B2c694223e4E79) — appraiser `0xd65c3f42cd889E471802B2c8d183E50a5f098F15`; attestations written and read back live from visitor wallets.
+- **Live market data:** comps come from the **OKX DEX Market API** (X Layer mainnet reference assets: native USDC, USDT, WETH — real price/volume/liquidity), with a seeded fallback if the API is unreachable. The engine flags which source served each appraisal (`comps_source: live | seeded`), and the dashboard labels it.
+- **Live app:** https://pricewise-1cpo.onrender.com — Gemini-powered reasoning, wallet connect + role grant + attest on X Layer testnet, kept warm by a self-ping keepalive (no cold starts on the free tier).
+- **Still open (documented seams):** mainnet launch, npm publish of `@pricewise/*`, OKX.AI ASP listing, OKX DEX swap on the act step (mainnet-only API).
 
 ## Stack
 Solidity + Foundry · TypeScript + viem / MCP / Hono / React · Python + LangGraph + FastAPI · OKX OnchainOS (`okx-dex-market`, `okx-agentic-wallet`, OKX DEX Swap, `okx-ai`, x402).
